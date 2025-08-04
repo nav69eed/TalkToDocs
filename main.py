@@ -213,7 +213,7 @@ def save_chat_history():
         json.dump(st.session_state.messages, f)
 
 # Streamlit app setup
-st.title("AI Multi-Document Study Assistant")
+st.title("TalkToDocs: A Multi-Document Study Assistant")
 st.write("Upload multiple documents (PDF, DOCX, TXT) and ask anything about them. Get summaries, MCQs, definitions, and more from all your documents at once.")
 
 # Sidebar for API key and file upload
