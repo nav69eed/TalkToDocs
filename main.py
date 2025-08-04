@@ -91,30 +91,105 @@ def create_vector_store(texts):
 # Function to determine user intent and select prompt template
 def get_prompt_template(intent):
     templates = {
-        "summarize": PromptTemplate(
-            input_variables=["context"],
-            template="Summarize the following document content in 3-5 sentences:\n{context}"
-        ),
-        "mcq": PromptTemplate(
-            input_variables=["context"],
-            template="Generate 5 multiple-choice questions based on the following content. Each question should have 4 options and indicate the correct answer:\n{context}"
-        ),
-        "definitions": PromptTemplate(
-            input_variables=["context"],
-            template="Extract and list key definitions or terms from the following content:\n{context}"
-        ),
-        "compare": PromptTemplate(
-            input_variables=["context"],
-            template="Provide a comparison based on the following content and the user's specific comparison request:\n{context}"
-        ),
-        "bullet_points": PromptTemplate(
-            input_variables=["context"],
-            template="List all bullet points from the following content:\n{context}"
-        ),
-        "default": PromptTemplate(
-            input_variables=["context"],
-            template="Answer the following question based on the document content:\n{context}"
-        )
+        "summarize": PromptTemplate(input_variables=["context"],template="""
+        You are an expert academic assistant. Your goal is to extract the **most important ideas** from the given document. 
+
+        Analyze it **as a whole**. Then, write a clear and concise **summary (3-5 sentences)** that captures the core themes, key arguments, and any major conclusions.
+
+        Avoid repeating minor points or redundant details. Focus on what a reader *must know* to understand the essence of the document.
+        make impotant terms bold
+
+        --- Document Start ---
+        {context}
+        --- Document End ---
+        
+        Summary:"""),
+
+
+        "mcq": PromptTemplate(input_variables=["context"],template="""
+        You are a subject matter expert and assessment designer.
+
+        Your task is to create **multiple-choice questions** that accurately reflect the core ideas, facts, or concepts from the document provided.
+
+        Each question must:
+        - Be **clear**, **unambiguous**, and **answerable** from the content.
+        - Include **4 distinct answer options (A–D)**.
+        - Clearly **mark the correct option**.
+        - Avoid overly trivial or overly complex questions.
+        - Focus on **important information**—not minor details.
+        - Mix up types of questions: factual, conceptual, interpretative if possible.
+        - each option on new line
+
+        Use the following format:
+
+        Q1. [Your question here]  \n
+        A. Option A  \n
+        B. Option B  \n
+        C. Option C  \n
+        D. Option D  \n
+        **Correct Answer: [A/B/C/D]**
+
+        ---
+
+        Here’s the content to base the questions on:
+
+        --- Document Start ---
+        {context}
+        --- Document End ---
+        
+        Now, generate the questions:"""),
+
+        
+        "definitions": PromptTemplate(input_variables=["context"],template="""
+        Identify and extract important *technical terms*, *concepts*, or *jargon* from the following content.
+
+        For each term, provide:
+        - The **term** itself (in bold)
+        - A clear and concise **definition** (1–2 lines)
+        - An optional **example or context** of how it’s used, if available in the content
+
+        Only include terms that are **relevant**, **non-obvious**, and **central** to understanding the topic.
+
+        Content:
+        {context}"""),
+
+        "compare": PromptTemplate(input_variables=["context"],template="""
+        You are given the following content and a specific comparison request by the user.
+
+        Your task:
+        - Identify the **key elements/entities** that need to be compared.
+        - Provide a **clear, structured comparison** using either a table or bullet points.
+        - Cover aspects such as: definition, purpose, components, advantages, disadvantages, use-cases, or any other relevant dimensions.
+        - Keep the tone **neutral, informative**, and **precise**.
+
+        Only compare what's present in the content and **don’t assume anything not mentioned**.
+
+        Content to analyze:
+        {context}"""),
+        
+        "bullet_points": PromptTemplate(input_variables=["context"],template="""
+        Read the following content and extract all relevant information as **clear, concise bullet points**.
+
+        Your task:
+        - Focus on **key facts, ideas, or takeaways**.
+        - Keep each bullet **short and focused** (1-2 lines max).
+        - Use parallel structure if listing multiple related points.
+        - Do **not rephrase too much**—preserve original meaning.
+
+        Content:
+        {context}"""),
+
+
+        "default": PromptTemplate(input_variables=["context"],template="""
+        You’re chatting with a user who’s asking a question about the following content.
+
+        Your job:
+        - Read the document carefully.
+        - Answer the question clearly and directly.
+        - If the document doesn’t answer it, say so—don’t make stuff up.
+
+        Content:
+        {context}""")
     }
     
     # Simple intent detection based on keywords
